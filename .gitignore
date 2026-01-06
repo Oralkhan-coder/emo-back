@@ -59,18 +59,6 @@ coverage/
 *.njsproj
 *.sln
 
-# ======================
-# OS files
-# ======================
-.DS_Store
-Thumbs.db
+# 
 
-# ======================
-# Optional: TypeScript
-# ======================
-*.tsbuildinfo
 
-# ======================
-# Optional: Docker
-# ======================
-.dockerignore
