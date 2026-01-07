@@ -1,25 +1,86 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
-const userSchema = new mongoose.Schema({
-  fullName: { type: String, required: true, trim: true },
-  email: { type: String, required: true, trim: true, unique: true },
-  password: { type: String, required: true },
-  isVerified: { type: Boolean, required: true, default: false },
-  createdAt: { type: Date, required: true, default: Date.now },
+const userSchema = new mongoose.Schema(
+    {
+        email: {
+            type: String,
+            required: [true, "Email is required"],
+            unique: true,
+            lowercase: true,
+            trim: true,
+            match: [/^\S+@\S+\.\S+$/, "Please provide a valid email"],
+        },
+        password: {
+            type: String,
+            required: [true, "Password is required"],
+            minlength: 6,
+            select: false,
+        },
+        name: {
+            type: String,
+            required: [true, "Name is required"],
+            trim: true,
+        },
+        role: {
+            type: String,
+            enum: ["student", "teacher", "admin"],
+            default: "student",
+        },
+        isEmailVerified: {
+            type: Boolean,
+            default: false,
+        },
+        emailVerificationToken: {
+            type: String,
+            select: false,
+        },
+        emailVerificationExpires: {
+            type: Date,
+            select: false,
+        },
+        resetPasswordToken: {
+            type: String,
+            select: false,
+        },
+        resetPasswordExpires: {
+            type: Date,
+            select: false,
+        },
+        refreshToken: {
+            type: String,
+            select: false,
+        },
+    },
+    {
+        timestamps: true,
+    }
+);
+
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+    } catch (error) {
+        throw error;
+    }
 });
 
-// Pre-save hook to hash password
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.methods.comparePassword = async function (candidatePassword) {
+    return await bcrypt.compare(candidatePassword, this.password);
+};
 
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (err) {
-    next(err);
-  }
-});
+userSchema.methods.generateVerificationToken = function () {
+    const token = crypto.randomBytes(32).toString("hex");
+    this.emailVerificationToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+    this.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000;
+    return token;
+};
 
 module.exports = mongoose.model("User", userSchema);

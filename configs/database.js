@@ -7,7 +7,6 @@ const dbName = process.env.MONGODB_DB_NAME || "emo_db";
 
 const connectDB = async () => {
   try {
-    // Ensure no double slashes if dbUrl ends with /
     const cleanUrl = dbUrl.endsWith('/') ? dbUrl.slice(0, -1) : dbUrl;
     await mongoose.connect(`${cleanUrl}/${dbName}`);
     logger.info("Connected to Database");

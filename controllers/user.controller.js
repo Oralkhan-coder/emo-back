@@ -9,8 +9,7 @@ class UserController {
             res.status(201).json(user);
         } catch (err) {
             logger.error("Failed to create user", err);
-            // Determine status code based on error message or type (simple heuristic for now)
-            const statusCode = err.message.includes("exists") ? 409 : 400; // 409 Conflict if user exists
+            const statusCode = err.message.includes("exists") ? 409 : 400;
             res.status(statusCode).json({ message: err.message });
         }
     }
