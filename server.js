@@ -4,6 +4,7 @@ const cors = require("cors");
 const logger = require("./utils/log");
 const { connectDB } = require("./configs/database");
 const { requestLogger, errorHandler } = require("./middlewares/log.middleware");
+const userRoutes = require("./routes/user.router")
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -17,7 +18,8 @@ app.use(
 app.use(express.json());
 app.use(requestLogger);
 /* --- Routes --- */
-// app.use('/api/users', userRoutes);
+app.use('/api/users', userRoutes);
+/* --- --- */
 app.use(errorHandler);
 
 const startServer = async () => {
