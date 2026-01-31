@@ -20,7 +20,6 @@ app.use(express.json());
 app.use(requestLogger);
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/courses', require('./routes/course.router'));
 app.use(errorHandler);
 
 const startServer = async () => {
