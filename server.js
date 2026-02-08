@@ -19,6 +19,7 @@ app.use(requestLogger);
 app.use('/api/users', require("./routes/user.router"));
 app.use('/api/auth', require("./routes/auth.router"));
 app.use('/api/sellers', require("./routes/seller.router"));
+app.use('/api/products', require("./routes/product.router"));
 app.use(errorHandler);
 
 const startServer = async () => {
