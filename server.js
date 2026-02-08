@@ -4,8 +4,6 @@ const cors = require("cors");
 const logger = require("./utils/log");
 const { connectDB } = require("./configs/database");
 const { requestLogger, errorHandler } = require("./middlewares/log.middleware");
-const userRoutes = require("./routes/user.router")
-const authRoutes = require("./routes/auth.router")
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -18,8 +16,9 @@ app.use(
 
 app.use(express.json());
 app.use(requestLogger);
-app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/api/users', require("./routes/user.router"));
+app.use('/api/auth', require("./routes/auth.router"));
+app.use('/api/sellers', require("./routes/seller.router"));
 app.use(errorHandler);
 
 const startServer = async () => {
