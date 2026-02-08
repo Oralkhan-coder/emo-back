@@ -1,14 +1,10 @@
 const Product = require("../models/Product");
+const Category = require("../models/Category"); // Ensure Category model is registered
 
 class ProductService {
     async createProduct(data) {
-        try {
-            const product = new Product(data);
-            return await product.save();
-        } catch (error) {
-            console.error("Error saving product:", error);
-            throw error;
-        }
+        const product = new Product(data);
+        return await product.save();
     }
 
     async getAllProducts(query = {}) {
