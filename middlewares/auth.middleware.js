@@ -16,7 +16,7 @@ const authenticate = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
-    req.user = { userId: decoded.userId, role: decoded.role };
+    req.user = { id: decoded.userId, userId: decoded.userId, role: decoded.role };
 
     next();
   } catch (error) {
@@ -71,4 +71,8 @@ const authorize = (...roles) => {
   };
 };
 
-module.exports = { authenticate, optionalAuth, authorize };
+const requireRole = (...roles) => {
+  return authorize(...roles);
+};
+
+module.exports = { authenticate, optionalAuth, authorize, requireRole };
