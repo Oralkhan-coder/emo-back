@@ -20,6 +20,9 @@ app.use('/api/users', require("./routes/user.router"));
 app.use('/api/auth', require("./routes/auth.router"));
 app.use('/api/sellers', require("./routes/seller.router"));
 app.use('/api/products', require("./routes/product.router"));
+app.use('/api/categories', require("./routes/category.router"));
+app.use('/api/variants', require("./routes/productVariant.router"));
+app.use('/api/images', require("./routes/productImage.router"));
 app.use(errorHandler);
 
 const startServer = async () => {
