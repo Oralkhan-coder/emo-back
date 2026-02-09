@@ -3,7 +3,6 @@ const router = express.Router();
 const cartController = require("../controllers/cart.controller");
 const { authenticate } = require("../middlewares/auth.middleware");
 
-// All cart routes require authentication
 router.use(authenticate);
 
 router.get("/", cartController.getCart);

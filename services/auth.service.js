@@ -179,6 +179,46 @@ class AuthService {
       throw error;
     }
   }
+
+  async updateProfile(userId, updateData) {
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      if (updateData.email && updateData.email !== user.email) {
+        const existingUser = await User.findOne({ email: updateData.email });
+        if (existingUser) {
+          throw new Error('Email already in use');
+        }
+        user.email = updateData.email;
+        user.isEmailVerified = false; // Reset verification if email changes
+        const token = user.generateVerificationToken();
+        await emailService.sendVerificationEmail(user.email, token);
+      }
+
+      if (updateData.name) {
+        user.name = updateData.name;
+      }
+
+      await user.save();
+
+      return {
+        message: 'Profile updated successfully',
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+          role: user.role
+        }
+      };
+    } catch (error) {
+      logger.error(`Update profile error: ${error.message}`);
+      throw error;
+    }
+  }
 }
 
 module.exports = new AuthService();
