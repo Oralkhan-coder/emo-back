@@ -44,18 +44,12 @@ A robust backend REST API built with Node.js, Express, and MongoDB. This project
     JWT_REFRESH_SECRET=your_refresh_secret_key
     JWT_ACCESS_EXPIRY=15m
     JWT_REFRESH_EXPIRY=7d
-    # Email settings (if using email service)
-    # SMTP_HOST=...
-    # SMTP_USER=...
-    # SMTP_PASS=...
     ```
 
 4.  **Run the server:**
     ```bash
-    # Development mode (with nodemon)
     npm run dev
 
-    # Production mode
     npm start
     ```
 

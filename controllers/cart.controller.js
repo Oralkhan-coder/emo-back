@@ -1,7 +1,7 @@
 const Cart = require("../models/Cart");
 const CartItem = require("../models/CartItem");
 const ProductVariant = require("../models/ProductVariant");
-const Product = require("../models/Product"); // Needed potentially for population
+const Product = require("../models/Product");
 
 exports.getCart = async (req, res) => {
     try {
@@ -34,7 +34,6 @@ exports.addToCart = async (req, res) => {
             return res.status(400).json({ message: "Product Variant ID and Quantity are required" });
         }
 
-        // Check availability
         const variant = await ProductVariant.findById(product_variant_id);
         if (!variant) {
             return res.status(404).json({ message: "Product variant not found" });
@@ -43,24 +42,20 @@ exports.addToCart = async (req, res) => {
             return res.status(400).json({ message: "Insufficient stock" });
         }
 
-        // Get or Create Cart
         let cart = await Cart.findOne({ user_id: userId });
         if (!cart) {
             cart = await Cart.create({ user_id: userId });
         }
 
-        // Check if item exists in cart
         let cartItem = await CartItem.findOne({ cart_id: cart._id, product_variant_id });
 
         if (cartItem) {
-            // Update quantity
             cartItem.quantity += quantity;
             if (variant.stock_quantity < cartItem.quantity) {
                 return res.status(400).json({ message: "Insufficient stock for update" });
             }
             await cartItem.save();
         } else {
-            // Create new item
             cartItem = await CartItem.create({
                 cart_id: cart._id,
                 product_variant_id,
@@ -85,7 +80,6 @@ exports.updateCartItem = async (req, res) => {
             return res.status(400).json({ message: "Invalid quantity" });
         }
 
-        // Verify cart ownership implicitly or explicitly
         const cart = await Cart.findOne({ user_id: userId });
         if (!cart) return res.status(404).json({ message: "Cart not found" });
 
@@ -94,7 +88,6 @@ exports.updateCartItem = async (req, res) => {
             return res.status(404).json({ message: "Item not found in your cart" });
         }
 
-        // Check stock
         const variant = await ProductVariant.findById(cartItem.product_variant_id);
         if (variant && variant.stock_quantity < quantity) {
             return res.status(400).json({ message: "Insufficient stock" });
@@ -113,7 +106,7 @@ exports.updateCartItem = async (req, res) => {
 exports.removeFromCart = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { id } = req.params; // CartItem ID
+        const { id } = req.params;
 
         const cart = await Cart.findOne({ user_id: userId });
         if (!cart) return res.status(404).json({ message: "Cart not found" });

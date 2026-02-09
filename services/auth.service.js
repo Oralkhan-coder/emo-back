@@ -32,7 +32,6 @@ class AuthService {
 
       const user = new User({ email, password, name, role });
 
-      // Generate verification token
       const verificationToken = user.generateVerificationToken();
       await user.save();
 
@@ -194,7 +193,7 @@ class AuthService {
           throw new Error('Email already in use');
         }
         user.email = updateData.email;
-        user.isEmailVerified = false; // Reset verification if email changes
+        user.isEmailVerified = false;
         const token = user.generateVerificationToken();
         await emailService.sendVerificationEmail(user.email, token);
       }

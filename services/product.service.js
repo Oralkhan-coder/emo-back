@@ -14,7 +14,7 @@ class ProductService {
     async getAllProducts(query = {}) {
         return await Product.find(query)
             .populate("seller_id", "shop_name")
-            .populate("category_id", "name"); // Assuming Category will have a name
+            .populate("category_id", "name");
     }
 
     async getProductById(id) {

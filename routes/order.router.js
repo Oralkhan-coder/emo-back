@@ -3,7 +3,6 @@ const router = express.Router();
 const orderController = require("../controllers/order.controller");
 const { authenticate } = require("../middlewares/auth.middleware");
 
-// All order routes require authentication
 router.use(authenticate);
 
 router.post("/", orderController.createOrder);

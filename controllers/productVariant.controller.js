@@ -15,7 +15,6 @@ class ProductVariantController {
 
     async getVariantsByProduct(req, res) {
         try {
-            // Can accept productId from query or body, but typically GET /variants?product_id=...
             const { product_id } = req.query;
             if (!product_id) {
                 return res.status(400).json({ message: "product_id is required" });

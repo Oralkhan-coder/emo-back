@@ -7,7 +7,6 @@ class CategoryService {
     }
 
     async getAllCategories() {
-        // Return full list. Frontend can build tree or we can populate parent_id if needed.
         return await Category.find().populate("parent_id", "name slug");
     }
 
@@ -32,7 +31,6 @@ class CategoryService {
     }
 
     async deleteCategory(id) {
-        // Optionally check for children before deleting?
         const category = await Category.findByIdAndDelete(id);
         if (!category) {
             throw new Error("Category not found");

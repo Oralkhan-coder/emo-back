@@ -11,7 +11,6 @@ class SellerService {
         const seller = new Seller(data);
         await seller.save();
 
-        // Update user role to seller
         await User.findByIdAndUpdate(data.user_id, { role: "seller" });
 
         return seller;

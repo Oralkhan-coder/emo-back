@@ -8,7 +8,6 @@ const Product = require("../models/Product");
 exports.createOrder = async (req, res) => {
     try {
         const userId = req.user.userId;
-        // Optional: specific items to order (Buy Now), otherwise use Cart
         const { items: directItems, currency = "KZT" } = req.body;
 
         let orderItemsData = [];
@@ -17,7 +16,6 @@ exports.createOrder = async (req, res) => {
         if (directItems && directItems.length > 0) {
             orderItemsData = directItems;
         } else {
-            // Fetch from Cart
             const cart = await Cart.findOne({ user_id: userId });
             if (!cart) {
                 return res.status(400).json({ message: "Cart is empty" });
@@ -33,7 +31,6 @@ exports.createOrder = async (req, res) => {
         let totalAmount = 0;
         const finalOrderItems = [];
 
-        // Validate and Prepare Items
         for (const item of orderItemsData) {
             const variant = await ProductVariant.findById(item.product_variant_id).populate("product_id");
 
@@ -62,15 +59,12 @@ exports.createOrder = async (req, res) => {
                 seller_id: sellerId,
                 price: variant.price,
                 quantity: item.quantity,
-                // We'll add order_id later
             });
 
-            // Decrease Stock (Simple approach)
             variant.stock_quantity -= item.quantity;
             await variant.save();
         }
 
-        // Create Order
         const order = await Order.create({
             user_id: userId,
             status: "new",
@@ -78,7 +72,6 @@ exports.createOrder = async (req, res) => {
             currency: currency,
         });
 
-        // Create Order Items
         const orderItemsToSave = finalOrderItems.map(item => ({
             ...item,
             order_id: order._id
@@ -86,7 +79,6 @@ exports.createOrder = async (req, res) => {
 
         await OrderItem.insertMany(orderItemsToSave);
 
-        // Clear Cart if order was from cart
         if (fromCart) {
             const cart = await Cart.findOne({ user_id: userId });
             if (cart) {
@@ -128,7 +120,7 @@ exports.getOrderById = async (req, res) => {
                 path: "product_variant_id",
                 populate: { path: "product_id" }
             })
-            .populate("seller_id", "name email"); // Assuming Seller has name/email
+            .populate("seller_id", "name email");
 
         res.status(200).json({ order, items });
     } catch (error) {
@@ -137,13 +129,8 @@ exports.getOrderById = async (req, res) => {
     }
 };
 
-// Optional: Admin/Seller update status
 exports.updateOrderStatus = async (req, res) => {
     try {
-        // NOTE: In a real app, check for Admin or Seller role.
-        // For now allowing authenticated user to simulate logic or restricted to owner?
-        // Let's restrict to owner for cancellation or assume this is a general endpoint protected by middlewares we don't fully see yet.
-        // I will assume simple logic: User can cancel "new" orders.
 
         const userId = req.user.userId;
         const { id } = req.params;
@@ -152,11 +139,9 @@ exports.updateOrderStatus = async (req, res) => {
         const order = await Order.findOne({ _id: id });
         if (!order) return res.status(404).json({ message: "Order not found" });
 
-        // Simple authorization check (User cancel)
         if (order.user_id.toString() === userId) {
             if (status === 'canceled' && order.status === 'new') {
                 order.status = 'canceled';
-                // TODO: Revert stock?
                 await order.save();
                 return res.status(200).json({ message: "Order canceled", order });
             } else {
@@ -164,7 +149,6 @@ exports.updateOrderStatus = async (req, res) => {
             }
         }
 
-        // Return forbidden if trying to do other status changes without admin rights
         return res.status(403).json({ message: "Not authorized to perform this status change" });
 
     } catch (error) {
