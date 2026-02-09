@@ -4,7 +4,11 @@ const logger = require("../utils/log");
 class SellerController {
     async createSeller(req, res) {
         try {
-            const seller = await sellerService.createSeller(req.body);
+            const sellerData = {
+                ...req.body,
+                user_id: req.user.id
+            };
+            const seller = await sellerService.createSeller(sellerData);
             logger.info(`New seller created: ${seller.shop_name}`);
             res.status(201).json(seller);
         } catch (err) {
@@ -37,9 +41,14 @@ class SellerController {
 
     async updateSeller(req, res) {
         try {
-            const seller = await sellerService.updateSeller(req.params.id, req.body);
-            logger.info(`Seller updated: ${seller.shop_name}`);
-            res.json(seller);
+            const seller = await sellerService.getSellerById(req.params.id);
+            const sellerUserId = seller.user_id._id ? seller.user_id._id.toString() : seller.user_id.toString();
+            if (sellerUserId !== req.user.id.toString() && req.user.role !== "admin") {
+                return res.status(403).json({ message: "You can only update your own seller profile" });
+            }
+            const updatedSeller = await sellerService.updateSeller(req.params.id, req.body);
+            logger.info(`Seller updated: ${updatedSeller.shop_name}`);
+            res.json(updatedSeller);
         } catch (err) {
             logger.error(`Failed to update seller with id ${req.params.id}`, err);
             const statusCode = err.message === "Seller not found" ? 404 : 400;
@@ -49,6 +58,11 @@ class SellerController {
 
     async deleteSeller(req, res) {
         try {
+            const seller = await sellerService.getSellerById(req.params.id);
+            const sellerUserId = seller.user_id._id ? seller.user_id._id.toString() : seller.user_id.toString();
+            if (sellerUserId !== req.user.id.toString() && req.user.role !== "admin") {
+                return res.status(403).json({ message: "You can only delete your own seller profile" });
+            }
             await sellerService.deleteSeller(req.params.id);
             logger.info(`Seller deleted with id ${req.params.id}`);
             res.status(204).send();

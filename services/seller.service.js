@@ -1,4 +1,5 @@
 const Seller = require("../models/Seller");
+const User = require("../models/User");
 
 class SellerService {
     async createSeller(data) {
@@ -8,7 +9,12 @@ class SellerService {
         }
 
         const seller = new Seller(data);
-        return await seller.save();
+        await seller.save();
+
+        // Update user role to seller
+        await User.findByIdAndUpdate(data.user_id, { role: "seller" });
+
+        return seller;
     }
 
     async getAllSellers() {
@@ -20,6 +26,11 @@ class SellerService {
         if (!seller) {
             throw new Error("Seller not found");
         }
+        return seller;
+    }
+
+    async getSellerByUserId(userId) {
+        const seller = await Seller.findOne({ user_id: userId }).populate("user_id", "name email");
         return seller;
     }
 
