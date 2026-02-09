@@ -18,7 +18,7 @@ const productImageSchema = new mongoose.Schema(
         },
     },
     {
-        timestamps: false, // Not explicitly requested, but good practice. User asked for {id, product_id, image_url, sort_order}
+        timestamps: false,
     }
 );
 

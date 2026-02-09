@@ -19,7 +19,7 @@ const orderItemSchema = new mongoose.Schema(
         },
         price: {
             type: Number,
-            required: [true, "Price is required"], // Price at the time of order
+            required: [true, "Price is required"],
             min: 0,
         },
         quantity: {

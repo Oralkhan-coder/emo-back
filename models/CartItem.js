@@ -24,7 +24,6 @@ const cartItemSchema = new mongoose.Schema(
     }
 );
 
-// Ensure a product variant appears only once per cart
 cartItemSchema.index({ cart_id: 1, product_variant_id: 1 }, { unique: true });
 
 module.exports = mongoose.model("CartItem", cartItemSchema);
