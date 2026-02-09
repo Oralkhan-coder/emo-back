@@ -31,7 +31,7 @@ const schemas = {
         name: Joi.string().required().messages({
             'any.required': 'Name is required',
         }),
-        role: Joi.string().valid('user', 'admin').default('user'),
+        role: Joi.string().valid('USER', 'admin', 'SELLER').default('USER'),
     }),
     login: Joi.object({
         email: Joi.string().email().required().messages({
