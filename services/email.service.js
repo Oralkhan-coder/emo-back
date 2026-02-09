@@ -19,7 +19,7 @@ class EmailService {
   }
 
   async sendVerificationEmail(email, token) {
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+    const verificationUrl = `https://emo-back-xtg8.onrender.com/api/auth/verify-email?token=${token}`;
 
     const mailOptions = {
       from: `"${process.env.APP_NAME}" <${process.env.EMAIL_FROM}>`,
